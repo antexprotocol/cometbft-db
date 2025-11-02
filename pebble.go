@@ -2,10 +2,11 @@ package db
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"path/filepath"
 
-	"github.com/cockroachdb/pebble"
+	"github.com/cockroachdb/pebble/v2"
 )
 
 func init() {
@@ -131,7 +132,7 @@ func (db *PebbleDB) Compact(start, end []byte) (err error) {
 	// In case the start and end keys are the same
 	// pebbleDB will throw an error that it cannot compact.
 	if start != nil && end != nil {
-		return db.db.Compact(start, end, true)
+		return db.db.Compact(context.Background(), start, end, true)
 	}
 	iter, err := db.db.NewIter(nil)
 	if err != nil {
@@ -149,7 +150,7 @@ func (db *PebbleDB) Compact(start, end []byte) (err error) {
 	if end == nil && iter.Last() {
 		end = append(end, iter.Key()...)
 	}
-	return db.db.Compact(start, end, true)
+	return db.db.Compact(context.Background(), start, end, true)
 }
 
 // Close implements DB.
